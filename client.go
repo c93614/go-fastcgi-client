@@ -388,7 +388,12 @@ func (w *streamReader) Read(p []byte) (n int, err error) {
 // Do made the request and returns a io.Reader that translates the data read
 // from fcgi responder out of fcgi packet before returning it.
 func (c *FCGIClient) Do(p map[string]string, req io.Reader) (r io.Reader, err error) {
-	err = c.writeBeginRequest(uint16(Responder), 0)
+	keepConn := uint8(0)
+	if c.keepAlive {
+		keepConn = FCGIKeepConn
+	}
+
+	err = c.writeBeginRequest(uint16(Responder), keepConn)
 	if err != nil {
 		return
 	}
